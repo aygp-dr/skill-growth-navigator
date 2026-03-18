@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillGrowthNavigator</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>SkillGrowthNavigator</h1>
+      <p class="subtitle">Identify skill gaps and discover your personalized learning path</p>
+    </div>
+    <div class="profile-controls">
+      <input id="username" type="text" placeholder="Username" maxlength="50">
+      <button class="btn btn-secondary" onclick="loadProfile()">Load</button>
+      <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <section class="goal-section">
+        <h2>Career Goal</h2>
+        <select id="career-goal" onchange="onSelectionChange()">
+          <option value="">-- Select a career goal --</option>
+          {% for goal_id, goal in career_goals.items() %}
+          <option value="{{ goal_id }}">{{ goal.name }}</option>
+          {% endfor %}
+        </select>
+        <p id="goal-description" class="goal-desc"></p>
+      </section>
+
+      <section class="skills-section">
+        <h2>Your Current Skills <span id="skill-count" class="badge">0 / 30</span></h2>
+        {% for domain in domains %}
+        <div class="domain-group">
+          <h3 class="domain-header domain-{{ domain }}">{{ domain | title }}</h3>
+          {% for skill_id, skill in skills.items() if skill.domain == domain %}
+          <label class="skill-label">
+            <input type="checkbox" class="skill-checkbox" value="{{ skill_id }}" onchange="onSelectionChange()">
+            <span class="skill-name">{{ skill.name }}</span>
+            <span class="level-badge level-{{ skill.level }}">{{ skill.level }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </section>
+    </aside>
+
+    <main>
+      <section class="graph-section">
+        <h2>Skill Graph</h2>
+        <div id="graph-container"></div>
+        <div class="graph-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#58a6ff"></span>Backend</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#f97583"></span>Frontend</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#56d364"></span>DevOps</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#d2a8ff"></span>Data</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#e3b341"></span>Security</span>
+          <span class="legend-sep">|</span>
+          <span class="legend-item"><span class="legend-icon">&#9679;</span> Acquired</span>
+          <span class="legend-item"><span class="legend-icon pulse">&#9675;</span> Recommended</span>
+        </div>
+      </section>
+
+      <section class="detail-section" id="skill-detail" style="display:none">
+        <h2 id="detail-name"></h2>
+        <div class="detail-meta">
+          <span id="detail-domain" class="domain-tag"></span>
+          <span id="detail-level" class="level-badge"></span>
+          <span id="detail-hours"></span>
+        </div>
+        <div id="detail-prereqs" class="detail-prereqs"></div>
+        <div class="detail-resources">
+          <h3>Learning Resources</h3>
+          <ul id="detail-resources"></ul>
+        </div>
+      </section>
+
+      <section class="recommendations-section">
+        <h2>Recommended Next Skills
+          <span id="rec-hours" class="badge"></span>
+        </h2>
+        <div id="recommendations">
+          <p class="empty-state">Select a career goal and mark your current skills to get personalized recommendations.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>SkillGrowthNavigator &mdash; AI-powered skill gap analysis and learning path recommendations</p>
+  </footer>
+
+  <script src="/static/graph.js"></script>
+</body>
+</html>
